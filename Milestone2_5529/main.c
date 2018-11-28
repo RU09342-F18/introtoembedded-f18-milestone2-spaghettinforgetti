@@ -11,7 +11,7 @@ double temp;
 double ln;
 double tempk;
 double tempf;
-int setTemp = 75;
+int setTemp = 65;
 
 int main(void)
 {
@@ -59,7 +59,7 @@ int main(void)
    }
 }
 
-#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
+/*#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
 #pragma vector=USCI_A1_VECTOR
 __interrupt void USCI_A1_ISR(void)
 #elif defined(__GNUC__)
@@ -78,7 +78,7 @@ void __attribute__ ((interrupt(USCI_A1_VECTOR))) USCI_A1_ISR (void)
   case 4:break;                             // Vector 4 - TXIFG
   default: break;
   }
-}
+}*/
 
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
 #pragma vector = ADC12_VECTOR
@@ -127,15 +127,21 @@ __interrupt void TimerA (void)
 {
     switch(TA1IV)
     {
-        if(tempf > setTemp)
-        {
-            P1OUT ^= BIT0;
-            TA0CCR1 += 45;
-        }
-        else if(tempf < setTemp)
-        {
-            TA0CCR1 -= 45;
-        }
+        case 2:
+            if(tempf > setTemp)
+               {
+                   P1OUT ^= BIT0;
+                   TA0CCR1 += 45;
+                   if(TA0CCR1 > 255)
+                   {
+                       TA0CCR1 = 255;
+                   }
+               }
+               else if(tempf < setTemp && TA0CCR1 > 0)
+               {
+                   TA0CCR1 -= 45;
+               }
+            break;
     }
 }
 
